@@ -2,3 +2,5 @@ github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d h1:Byv0BzEl
 github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d/go.mod h1:WaHUgvxTVq04UNunO+XhnAqY/wQc+bxr74GqbsZ/Jqw=
 github.com/gorilla/mux v1.8.0 h1:i40aqfkR1h2SlN9hojwV5ZA91wcXFOvkdNIeFDP5koI=
 github.com/gorilla/mux v1.8.0/go.mod h1:DVbg23sWSpFRCP0SfiEN6jmj59UnW/n46BH5rLB71So=
+github.com/rodriez/restface v0.0.0-20210505132412-1612d906ed66 h1:pqt2GQCbBjk3vXhBLEu4YelY6pOUYVls9WPg9P0pB+U=
+github.com/rodriez/restface v0.0.0-20210505132412-1612d906ed66/go.mod h1:btdjZIlQWZ53+1WD0JBgIpIan40N1BnZGAYcQCUZzl0=

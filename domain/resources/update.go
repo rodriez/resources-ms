@@ -2,23 +2,22 @@ package resources
 
 import (
 	"fmt"
-	"net/http"
 	"resources-ms/domain/resources/dto"
 	"resources-ms/domain/resources/entities"
-	"resources-ms/domain/resources/exceptions"
 	"resources-ms/domain/resources/gateways"
 	"time"
 
 	"github.com/asaskevich/govalidator"
+	"github.com/rodriez/restface"
 )
 
 type UpdateResourceUseCase struct {
 	FindResource   func(string) (gateways.IResource, error)
 	SaveResource   func(gateways.IResource) error
-	PresentSuccess func(gateways.IResource)
+	PresentSuccess func(interface{})
 }
 
-func (uc *UpdateResourceUseCase) Run(req *dto.UpdateResourceRequest) *exceptions.ApiError {
+func (uc *UpdateResourceUseCase) Run(req *dto.UpdateResourceRequest) *restface.ApiError {
 	if err := uc.validate(req); err != nil {
 		return err
 	}
@@ -33,10 +32,7 @@ func (uc *UpdateResourceUseCase) Run(req *dto.UpdateResourceRequest) *exceptions
 	resource.Updated = time.Now()
 
 	if err := uc.SaveResource(resource); err != nil {
-		return &exceptions.ApiError{
-			StatusCode: http.StatusInternalServerError,
-			Message:    err.Error(),
-		}
+		return restface.InternalError(err.Error())
 	}
 
 	uc.PresentSuccess(resource)
@@ -44,25 +40,25 @@ func (uc *UpdateResourceUseCase) Run(req *dto.UpdateResourceRequest) *exceptions
 	return nil
 }
 
-func (uc *UpdateResourceUseCase) getResource(req *dto.UpdateResourceRequest) (*entities.Resource, *exceptions.ApiError) {
+func (uc *UpdateResourceUseCase) getResource(req *dto.UpdateResourceRequest) (*entities.Resource, *restface.ApiError) {
 	res, err := uc.FindResource(req.ID)
 
 	if err != nil {
-		return nil, exceptions.InternalError(err.Error())
+		return nil, restface.InternalError(err.Error())
 	}
 
 	if res == nil {
-		return nil, exceptions.NotFound(fmt.Sprintf("resource %s not found", req.ID))
+		return nil, restface.NotFound(fmt.Sprintf("resource %s not found", req.ID))
 	}
 
-	return res.(*entities.Resource), nil
+	return entities.Resource{}.Parse(res), nil
 }
 
-func (uc *UpdateResourceUseCase) validate(req *dto.UpdateResourceRequest) *exceptions.ApiError {
+func (uc *UpdateResourceUseCase) validate(req *dto.UpdateResourceRequest) *restface.ApiError {
 	valid, err := govalidator.ValidateStruct(req)
 
 	if !valid {
-		return exceptions.BadRequest(err.Error())
+		return restface.BadRequest(err.Error())
 	}
 
 	return nil

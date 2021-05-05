@@ -2,16 +2,17 @@ package resources
 
 import (
 	"fmt"
-	"resources-ms/domain/resources/exceptions"
 	"resources-ms/domain/resources/gateways"
+
+	"github.com/rodriez/restface"
 )
 
 type FindResourceUseCase struct {
 	FindResource   func(string) (gateways.IResource, error)
-	PresentSuccess func(gateways.IResource)
+	PresentSuccess func(interface{})
 }
 
-func (uc *FindResourceUseCase) Run(id string) *exceptions.ApiError {
+func (uc *FindResourceUseCase) Run(id string) *restface.ApiError {
 	if err := uc.validate(id); err != nil {
 		return err
 	}
@@ -19,11 +20,11 @@ func (uc *FindResourceUseCase) Run(id string) *exceptions.ApiError {
 	resource, err := uc.FindResource(id)
 
 	if err != nil {
-		return exceptions.InternalError(err.Error())
+		return restface.InternalError(err.Error())
 	}
 
 	if resource == nil {
-		return exceptions.NotFound(fmt.Sprintf("resource %s not found", id))
+		return restface.NotFound(fmt.Sprintf("resource %s not found", id))
 	}
 
 	uc.PresentSuccess(resource)
@@ -31,9 +32,9 @@ func (uc *FindResourceUseCase) Run(id string) *exceptions.ApiError {
 	return nil
 }
 
-func (uc *FindResourceUseCase) validate(id string) *exceptions.ApiError {
+func (uc *FindResourceUseCase) validate(id string) *restface.ApiError {
 	if id == "" {
-		return exceptions.BadRequest("Invalid id")
+		return restface.BadRequest("Invalid id")
 	}
 
 	return nil

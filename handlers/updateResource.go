@@ -5,23 +5,20 @@ import (
 	"net/http"
 	"resources-ms/domain/resources"
 	"resources-ms/domain/resources/dto"
-	"resources-ms/domain/resources/exceptions"
 	"resources-ms/repositories"
 
 	"github.com/gorilla/mux"
+	"github.com/rodriez/restface"
 )
 
 func UpdateResource(res http.ResponseWriter, req *http.Request) {
 	repository := repositories.ResourceRepository{}
-	presenter := Presenter{Writer: res}
+	presenter := restface.Presenter{Writer: res}
 
 	var request dto.UpdateResourceRequest
 
 	if err := json.NewDecoder(req.Body).Decode(&request); err != nil {
-		presenter.PresentError(&exceptions.ApiError{
-			StatusCode: http.StatusBadRequest,
-			Message:    "Invalid JSON",
-		})
+		presenter.PresentError(restface.BadRequest("Invalid JSON"))
 
 		return
 	}

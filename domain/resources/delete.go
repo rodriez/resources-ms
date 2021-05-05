@@ -3,17 +3,18 @@ package resources
 import (
 	"fmt"
 	"resources-ms/domain/resources/entities"
-	"resources-ms/domain/resources/exceptions"
 	"resources-ms/domain/resources/gateways"
+
+	"github.com/rodriez/restface"
 )
 
 type DeleteResourceUseCase struct {
 	FindResource   func(string) (gateways.IResource, error)
 	RemoveResource func(string) error
-	PresentSuccess func(gateways.IResource)
+	PresentSuccess func(interface{})
 }
 
-func (uc *DeleteResourceUseCase) Run(id string) *exceptions.ApiError {
+func (uc *DeleteResourceUseCase) Run(id string) *restface.ApiError {
 	if err := uc.validate(id); err != nil {
 		return err
 	}
@@ -24,7 +25,7 @@ func (uc *DeleteResourceUseCase) Run(id string) *exceptions.ApiError {
 	}
 
 	if err := uc.RemoveResource(id); err != nil {
-		return exceptions.InternalError(err.Error())
+		return restface.InternalError(err.Error())
 	}
 
 	uc.PresentSuccess(resource)
@@ -32,23 +33,23 @@ func (uc *DeleteResourceUseCase) Run(id string) *exceptions.ApiError {
 	return nil
 }
 
-func (uc *DeleteResourceUseCase) getResource(id string) (*entities.Resource, *exceptions.ApiError) {
+func (uc *DeleteResourceUseCase) getResource(id string) (*entities.Resource, *restface.ApiError) {
 	res, err := uc.FindResource(id)
 
 	if err != nil {
-		return nil, exceptions.InternalError(err.Error())
+		return nil, restface.InternalError(err.Error())
 	}
 
 	if res == nil {
-		return nil, exceptions.NotFound(fmt.Sprintf("resource %s not found", id))
+		return nil, restface.NotFound(fmt.Sprintf("resource %s not found", id))
 	}
 
-	return res.(*entities.Resource), nil
+	return entities.Resource{}.Parse(res), nil
 }
 
-func (uc *DeleteResourceUseCase) validate(id string) *exceptions.ApiError {
+func (uc *DeleteResourceUseCase) validate(id string) *restface.ApiError {
 	if id == "" {
-		return exceptions.BadRequest("Invalid id")
+		return restface.BadRequest("Invalid id")
 	}
 
 	return nil

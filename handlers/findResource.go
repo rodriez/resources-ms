@@ -6,11 +6,12 @@ import (
 	"resources-ms/repositories"
 
 	"github.com/gorilla/mux"
+	"github.com/rodriez/restface"
 )
 
 func FindResource(res http.ResponseWriter, req *http.Request) {
 	repository := repositories.ResourceRepository{}
-	presenter := Presenter{Writer: res}
+	presenter := restface.Presenter{Writer: res}
 
 	useCase := resources.FindResourceUseCase{
 		FindResource:   repository.FindResource,
