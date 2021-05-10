@@ -3,20 +3,21 @@ package handlers
 import (
 	"log"
 	"net/http"
+	"resources-ms/repositories"
 
 	"github.com/rodriez/restface"
 )
 
 func BasicAuthMiddleware(next http.Handler) http.Handler {
+	authRepo := &repositories.AuthRepository{}
+
 	return http.HandlerFunc(
 		func(res http.ResponseWriter, req *http.Request) {
 			log.Println("BasicAuthMiddleware")
 
-			authenticator := restface.BasicAuthenticator{
-				Request: req,
-				ValidUser: func(name, pass string) bool {
-					return name == "john" && pass == "johnS.67"
-				},
+			authenticator := &restface.BasicAuthenticator{
+				Request:   req,
+				ValidUser: authRepo.ValidateUser,
 			}
 
 			if err := authenticator.Authenticate(); err != nil {
