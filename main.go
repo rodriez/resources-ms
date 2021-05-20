@@ -1,30 +1,28 @@
 package main
 
 import (
-	"log"
 	"net/http"
-	"resources-ms/handlers"
+	"os"
+	"resources-ms/app"
 
-	"github.com/gorilla/mux"
+	"github.com/joho/godotenv"
+	"github.com/sirupsen/logrus"
 )
 
-func main() {
-	router := mux.NewRouter()
-
-	router.Use(handlers.BasicAuthMiddleware)
-
-	initRoutes(router)
-
-	log.Println("Listening por :8080")
-
-	if err := http.ListenAndServe(":8080", router); err != nil {
-		log.Fatal(err)
+func init() {
+	if err := godotenv.Load(); err != nil {
+		logrus.Fatal("Error loading .env file", err)
 	}
+
+	logrus.Info("Environment variables loaded")
 }
 
-func initRoutes(router *mux.Router) {
-	router.HandleFunc("/resource", handlers.CreateResource).Methods("POST")
-	router.HandleFunc("/resource/{id}", handlers.FindResource).Methods("GET")
-	router.HandleFunc("/resource/{id}", handlers.UpdateResource).Methods("PUT")
-	router.HandleFunc("/resource/{id}", handlers.DeleteResource).Methods("DELETE")
+func main() {
+	lvl, _ := logrus.ParseLevel(os.Getenv("LOG_LEVEL"))
+	logrus.SetLevel(lvl)
+	logrus.Info("Listening port :8080")
+
+	if err := http.ListenAndServe(":8080", app.Router); err != nil {
+		logrus.Fatal(err)
+	}
 }
