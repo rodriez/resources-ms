@@ -12,10 +12,7 @@ func BasicAuthMiddleware(next http.Handler) http.Handler {
 
 	return http.HandlerFunc(
 		func(res http.ResponseWriter, req *http.Request) {
-			authenticator := &restface.BasicAuthenticator{
-				Request:   req,
-				ValidUser: authRepo.ValidateUser,
-			}
+			authenticator := restface.NewBasicAuthenticator(req, authRepo.ValidateUser)
 
 			if err := authenticator.Authenticate(); err != nil {
 				presenter := restface.Presenter{Writer: res}
